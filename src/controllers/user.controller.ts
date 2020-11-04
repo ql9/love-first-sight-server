@@ -1,8 +1,16 @@
 import { User } from '../models/user.model';
 import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
+import nodemailer from 'nodemailer';
 
 const usersRef = db.collection('users');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'staplerapp@gmail.com',
+        pass: 'staplerapp123456',
+    },
+});
 
 // export const createUser = async (req: Request, res: Response) => {
 //     const user = req.body as User;
@@ -18,6 +26,38 @@ const usersRef = db.collection('users');
 //             });
 //         });
 // };
+function randomCode() {
+    return Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
+}
+
+export const sendCode = async (req: Request, res: Response) => {
+    await usersRef
+        .where('email', '==', req.body.email)
+        .get()
+        .then(async users => {
+            const usersId: string[] = [];
+            users.forEach(user => {
+                usersId.push(user.id);
+            });
+            if (usersId.length) {
+                res.status(405).json('that email address is already in use!');
+            }
+            const code = randomCode();
+            const mailOptions = {
+                from: 'Stapler team',
+                to: req.body.email,
+                subject: 'Sign-up code for Stapler',
+                text: 'This is code to active your Stapler account, do not share this code to anyone: ' + code,
+            };
+            await transporter.sendMail(mailOptions).then(() => {
+                console.log(code);
+                res.status(200).json(code);
+            });
+        })
+        .catch(() => {
+            res.status(500).json('can not send code to ' + req.body.email);
+        });
+};
 
 export const createUser = async (req: Request, res: Response) => {
     // const user = req.body as User;

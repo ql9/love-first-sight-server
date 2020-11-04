@@ -8,10 +8,12 @@ export const addMessage = async (req: Request, res: Response) => {
     const message = {
         createdAt: new Date().getTime(),
         text: req.body.text,
-        user: req.body.user
+        user: req.body.user,
     } as Message;
 
-    await messagesRef.doc('mHRJVnz0711rS1y1Of0E').collection('messages')
+    await messagesRef
+        .doc('mHRJVnz0711rS1y1Of0E')
+        .collection('messages')
         .add(message)
         .then(data => {
             return res.status(201).json(data.id);
@@ -23,29 +25,32 @@ export const addMessage = async (req: Request, res: Response) => {
         });
 };
 
-export const getMessages =  (req: Request, res: Response) => {
-    messagesRef.doc('mHRJVnz0711rS1y1Of0E').collection('messages')
-    .orderBy('createAt', 'desc').get()
-    .then(users => {
-        const results: {
-            _id: string;
-            data: FirebaseFirestore.DocumentData;
-        }[] = [];
+export const getMessages = (req: Request, res: Response) => {
+    messagesRef
+        .doc('mHRJVnz0711rS1y1Of0E')
+        .collection('messages')
+        .orderBy('createAt', 'desc')
+        .get()
+        .then(users => {
+            const results: {
+                _id: string;
+                data: FirebaseFirestore.DocumentData;
+            }[] = [];
 
-        users.forEach(user => results.push({ _id: user.id, data: user.data() }));
-        const arr = results.map(user => {
-            return {
-            _id: user._id,
-            ...user.data
+            users.forEach(user => results.push({ _id: user.id, data: user.data() }));
+            const arr = results.map(user => {
+                return {
+                    _id: user._id,
+                    ...user.data,
+                };
+            });
+            if (arr.length) {
+                res.status(200).json(arr);
+            } else {
+                res.status(404).json({ detail: 'No records found' });
             }
         })
-        if (arr.length) {
-            res.status(200).json(arr);
-        } else {
-            res.status(404).json({ detail: 'No records found' });
-        }
-    })
-    .catch(err => {
-        res.status(500).json(err);
-    });
+        .catch(err => {
+            res.status(500).json(err);
+        });
 };

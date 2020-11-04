@@ -4,7 +4,7 @@ const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://stapler-api.firebaseio.com',
+    databaseURL: 'https://stapler-cf434.firebaseio.com',
 });
 
 export const db = admin.firestore();
