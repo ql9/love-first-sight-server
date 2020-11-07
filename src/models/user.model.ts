@@ -19,7 +19,7 @@ export interface User {
     matches: Array<string>;
     messages: Array<string>;
     availableUsers: Array<string>;
-    nthUser: number;
+    createAt: number;
     report: number;
     coordinates: { lat: number; long: number };
 }

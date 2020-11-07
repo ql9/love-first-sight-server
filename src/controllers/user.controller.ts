@@ -60,53 +60,37 @@ export const sendCode = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-    // const user = req.body as User;
-    await usersRef
-        .orderBy('nthUser', 'desc')
-        .limit(1)
-        .get()
-        .then(async users => {
-            const userIdBefore: string[] = [];
-            users.forEach(user => {
-                userIdBefore.push(user.id);
-            });
-            let userId = 0;
-            if (userIdBefore.length) {
-                userId = parseInt(userIdBefore[0]) + 1;
-            }
-            const availableUsers: string[] = [];
-            for (let i = 0; i < userId; i++) {
-                availableUsers.push(i.toString());
-            }
-            const user = {
-                name: req.body.name,
-                email: req.body.email,
-                intro: req.body.intro,
-                birthday: req.body.birthday,
-                gender: req.body.gender,
-                avatar: req.body.avatar,
-                hobbies: req.body.hobbies,
-                availableUsers: availableUsers,
-                nthUser: userId,
-            } as User;
+    await usersRef.get().then(async users => {
+        const availableUsers: string[] = [];
+        users.forEach(user => availableUsers.push(user.id));
+        const user = {
+            name: req.body.name,
+            email: req.body.email,
+            intro: req.body.intro,
+            birthday: req.body.birthday,
+            gender: req.body.gender,
+            hobbies: req.body.hobbies,
+            createAt: new Date().getTime(),
+            availableUsers: availableUsers,
+        } as User;
 
-            await usersRef
-                .doc(userId.toString())
-                .set(user)
-                .then(async () => {
-                    for (let i = 0; i < userId; i++) {
-                        await usersRef.doc(i.toString()).update({
-                            availableUsers: FieldValue.arrayUnion(userId.toString()),
-                        });
-                    }
-                    res.status(200).json(userId);
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        message: err.message || 'Some error occurred while creating new user',
+        await usersRef
+            .doc(req.body.uid)
+            .set(user)
+            .then(async () => {
+                availableUsers.forEach(user => {
+                    usersRef.doc(user).update({
+                        availableUsers: FieldValue.arrayUnion(req.body.uid),
                     });
                 });
-        });
+                res.status(200).json('create success');
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message: err.message || 'Some error occurred while creating new user',
+                });
+            });
+    });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -131,17 +115,29 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
     await usersRef
-        .doc(req.params.userId)
+        .where('email', '==', req.params.email)
+        .limit(1)
         .get()
-        .then(user => {
-            if (user.exists) {
-                res.status(200).json(user.data());
+        .then(async users => {
+            const usersId: string[] = [];
+            users.forEach(user => usersId.push(user.id));
+            if (usersId.length) {
+                await usersRef
+                    .doc(usersId[0])
+                    .get()
+                    .then(user => {
+                        if (user.exists) {
+                            res.status(200).json(user.data());
+                        } else {
+                            res.status(404).json({ detail: 'Not found user' });
+                        }
+                    })
+                    .catch(err => {
+                        res.status(500).json(err);
+                    });
             } else {
                 res.status(404).json({ detail: 'Not found user' });
             }
-        })
-        .catch(err => {
-            res.status(500).json(err);
         });
 };
 

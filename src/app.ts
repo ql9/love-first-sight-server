@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Controller user
 app.post('/profile/create', userController.createUser);
-app.get('/profile/get/:userId', userController.getUser);
+app.get('/profile/get/:email', userController.getUser);
 app.get('/', userController.getAllUsers);
 app.put('/profile/update/:userId', userController.updateUser);
 app.delete('/profile/delete/:userId', userController.deleteUser);
