@@ -12,20 +12,6 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// export const createUser = async (req: Request, res: Response) => {
-//     const user = req.body as User;
-
-//     await usersRef
-//         .add(user)
-//         .then(data => {
-//             res.status(200).json(data.id);
-//         })
-//         .catch(err => {
-//             res.status(500).send({
-//                 message: err.message || 'Some error occurred while creating new user',
-//             });
-//         });
-// };
 function randomCode() {
     return Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
 }
@@ -62,6 +48,7 @@ export const sendCode = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
     await usersRef.get().then(async users => {
         const availableUsers: string[] = [];
+        const matches: string[] = [];
         users.forEach(user => availableUsers.push(user.id));
         const user = {
             name: req.body.name,
@@ -70,17 +57,18 @@ export const createUser = async (req: Request, res: Response) => {
             birthday: req.body.birthday,
             gender: req.body.gender,
             hobbies: req.body.hobbies,
+            matches: matches,
             createAt: new Date().getTime(),
             availableUsers: availableUsers,
         } as User;
 
         await usersRef
-            .doc(req.body.uid)
+            .doc(req.body.userId)
             .set(user)
             .then(async () => {
                 availableUsers.forEach(user => {
                     usersRef.doc(user).update({
-                        availableUsers: FieldValue.arrayUnion(req.body.uid),
+                        availableUsers: FieldValue.arrayUnion(req.body.userId),
                     });
                 });
                 res.status(200).json('create success');
@@ -115,29 +103,17 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
     await usersRef
-        .where('email', '==', req.params.email)
-        .limit(1)
+        .doc(req.params.userId)
         .get()
-        .then(async users => {
-            const usersId: string[] = [];
-            users.forEach(user => usersId.push(user.id));
-            if (usersId.length) {
-                await usersRef
-                    .doc(usersId[0])
-                    .get()
-                    .then(user => {
-                        if (user.exists) {
-                            res.status(200).json(user.data());
-                        } else {
-                            res.status(404).json({ detail: 'Not found user' });
-                        }
-                    })
-                    .catch(err => {
-                        res.status(500).json(err);
-                    });
+        .then(user => {
+            if (user.exists) {
+                res.status(200).json(user.data());
             } else {
                 res.status(404).json({ detail: 'Not found user' });
             }
+        })
+        .catch(err => {
+            res.status(500).json(err);
         });
 };
 
@@ -158,9 +134,7 @@ export const deleteUser = async (req: Request, res: Response) => {
         .doc(req.params.userId)
         .delete()
         .then(() => {
-            res.status(200).json({
-                detail: `user id: ${req.params.userId} deleted!`,
-            });
+            res.status(200).json(`user id: ${req.params.userId} deleted!`);
         })
         .catch(err => {
             res.status(500).json(err);

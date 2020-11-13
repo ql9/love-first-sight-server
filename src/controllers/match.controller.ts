@@ -127,14 +127,18 @@ export const get = async (req: Request, res: Response) => {
 };
 
 export const like = async (req: Request, res: Response) => {
-    // const userBeLiked = await usersRef.doc(req.params.userIdBeLiked).get();
-    // let x: FirebaseFirestore.DocumentData;
-    // x = userBeLiked;
-    // if (x.youLiked) {
-    //     console.log('co');
-    // } else {
-    //     console.log(x.availableUsers);
-    // }
+    const isLike = await usersRef
+        .doc(req.params.userIdBeLiked)
+        .get()
+        .then(user => {
+            let flag = false;
+            user.data()!.youLiked.forEach((uid: string) => {
+                if (uid === req.params.userId) {
+                    flag = true;
+                }
+            });
+            return flag;
+        });
 
     await usersRef
         .doc(req.params.userId)
@@ -142,7 +146,12 @@ export const like = async (req: Request, res: Response) => {
             youLiked: FieldValue.arrayUnion(req.params.userIdBeLiked),
             availableUsers: FieldValue.arrayRemove(req.params.userIdBeLiked),
         })
-        .then(user => {
+        .then(async user => {
+            if (isLike) {
+                await usersRef.doc(req.params.userId).update({
+                    matches: FieldValue.arrayUnion(req.params.userIdBeLiked),
+                });
+            }
             res.status(201).json(user);
         })
         .catch(err => {
