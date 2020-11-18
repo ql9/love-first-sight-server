@@ -48,7 +48,9 @@ export const sendCode = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
     await usersRef.get().then(async users => {
         const availableUsers: string[] = [];
+        const ignoredUsers: string[] = [];
         const matches: string[] = [];
+        const images: string[] = [];
         users.forEach(user => availableUsers.push(user.id));
         const user = {
             name: req.body.name,
@@ -57,9 +59,12 @@ export const createUser = async (req: Request, res: Response) => {
             birthday: req.body.birthday,
             gender: req.body.gender,
             hobbies: req.body.hobbies,
+            avatar: req.body.avatar,
             matches: matches,
             createAt: new Date().getTime(),
             availableUsers: availableUsers,
+            ignoredUsers: ignoredUsers,
+            images: images,
         } as User;
 
         await usersRef
@@ -79,26 +84,6 @@ export const createUser = async (req: Request, res: Response) => {
                 });
             });
     });
-};
-
-export const getAllUsers = async (req: Request, res: Response) => {
-    await usersRef
-        .get()
-        .then(users => {
-            const results: {
-                userId: string;
-                data: FirebaseFirestore.DocumentData;
-            }[] = [];
-            users.forEach(user => results.push({ userId: user.id, data: user.data() }));
-            if (results.length) {
-                res.status(200).json(results);
-            } else {
-                res.status(404).json({ detail: 'No records found' });
-            }
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
 };
 
 export const getUser = async (req: Request, res: Response) => {
@@ -135,6 +120,34 @@ export const deleteUser = async (req: Request, res: Response) => {
         .delete()
         .then(() => {
             res.status(200).json(`user id: ${req.params.userId} deleted!`);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const addImage = async (req: Request, res: Response) => {
+    await usersRef
+        .doc(req.params.userId)
+        .update({
+            images: FieldValue.arrayUnion(req.body.urlImage),
+        })
+        .then(user => {
+            res.status(201).json(user);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const removeImage = async (req: Request, res: Response) => {
+    await usersRef
+        .doc(req.params.userId)
+        .update({
+            images: FieldValue.arrayRemove(req.body.urlImage),
+        })
+        .then(user => {
+            res.status(201).json(user);
         })
         .catch(err => {
             res.status(500).json(err);

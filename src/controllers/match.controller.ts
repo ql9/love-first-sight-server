@@ -29,29 +29,27 @@ function computeAge(birthday: string) {
 
 export const get = async (req: Request, res: Response) => {
     const filter = req.body as Filter;
-    const previousUser = await usersRef.doc(filter.userIdPre).get();
+
+    console.log(filter);
+
     const currentUser = await usersRef.doc(filter.userId).get();
     await usersRef
         .where('availableUsers', 'array-contains', filter.userId)
         .orderBy(documentId)
-        .startAfter(previousUser)
         .limit(100)
         .get()
         .then(users => {
             let results: {
-                userId: number;
+                userId: string;
                 data: FirebaseFirestore.DocumentData;
             }[] = [];
-            users.forEach(user => results.push({ userId: parseInt(user.id), data: user.data() }));
+            users.forEach(user => results.push({ userId: user.id, data: user.data() }));
             if (filter.gender) {
                 results = results.filter(result => result.data.gender === filter.gender);
             }
             if (filter.distance) {
                 results = results.filter(function (result) {
-                    return (
-                        filter.distance.from <= getDistance(result.data.coordinates, currentUser.data()!.coordinates) &&
-                        getDistance(result.data.coordinates, currentUser.data()!.coordinates) <= filter.distance.to
-                    );
+                    return getDistance(result.data.coordinates, currentUser.data()!.coordinates) <= filter.distance;
                 });
             }
             if (filter.age) {
@@ -164,6 +162,21 @@ export const ignore = async (req: Request, res: Response) => {
         .doc(req.params.userId)
         .update({
             availableUsers: FieldValue.arrayRemove(req.params.userIdBeIgnored),
+            ignoredUsers: FieldValue.arrayUnion(req.params.userIdBeIgnored),
+        })
+        .then(user => {
+            res.status(201).json(user);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const report = async (req: Request, res: Response) => {
+    await usersRef
+        .doc(req.params.userIdBeReported)
+        .update({
+            report: FieldValue.increment(1),
         })
         .then(user => {
             res.status(201).json(user);

@@ -1,8 +1,7 @@
 export interface Filter {
     userId: string;
-    userIdPre: string;
     gender: string;
-    distance: { from: number; to: number };
+    distance: number;
     age: { from: number; to: number };
     height: { from: number; to: number };
     lookingFor: string;
