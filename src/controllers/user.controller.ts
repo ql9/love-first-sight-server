@@ -50,7 +50,9 @@ export const createUser = async (req: Request, res: Response) => {
         const availableUsers: string[] = [];
         const ignoredUsers: string[] = [];
         const matches: string[] = [];
-        const images: string[] = [];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore: Object is possibly 'null'
+        const images: string[] = [null, null, null, null, null, null, null, null];
         users.forEach(user => availableUsers.push(user.id));
         const user = {
             name: req.body.name,
@@ -120,34 +122,6 @@ export const deleteUser = async (req: Request, res: Response) => {
         .delete()
         .then(() => {
             res.status(200).json(`user id: ${req.params.userId} deleted!`);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
-};
-
-export const addImage = async (req: Request, res: Response) => {
-    await usersRef
-        .doc(req.params.userId)
-        .update({
-            images: FieldValue.arrayUnion(req.body.urlImage),
-        })
-        .then(user => {
-            res.status(201).json(user);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
-};
-
-export const removeImage = async (req: Request, res: Response) => {
-    await usersRef
-        .doc(req.params.userId)
-        .update({
-            images: FieldValue.arrayRemove(req.body.urlImage),
-        })
-        .then(user => {
-            res.status(201).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
