@@ -1,5 +1,4 @@
 import { db, FieldValue } from '../config/firebase';
-import { documentId } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Filter } from '../models/filer.model';
 
@@ -30,12 +29,13 @@ function computeAge(birthday: string) {
 export const get = async (req: Request, res: Response) => {
     const filter = req.body as Filter;
 
-    console.log(filter);
-
     const currentUser = await usersRef.doc(filter.userId).get();
+    // const previousUser = await usersRef.doc(filter.preUserId).get();
+
     await usersRef
         .where('availableUsers', 'array-contains', filter.userId)
-        .orderBy(documentId)
+        // .orderBy('createAt')
+        // .startAfter(previousUser)
         .limit(100)
         .get()
         .then(users => {
@@ -44,6 +44,7 @@ export const get = async (req: Request, res: Response) => {
                 data: FirebaseFirestore.DocumentData;
             }[] = [];
             users.forEach(user => results.push({ userId: user.id, data: user.data() }));
+
             if (filter.gender) {
                 results = results.filter(result => result.data.gender === filter.gender);
             }
@@ -114,7 +115,13 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (results.length) {
-                res.status(200).json(results);
+                const list = results.map(user => {
+                    return {
+                        userId: user.userId,
+                        ...user.data,
+                    };
+                });
+                res.status(200).json(list);
             } else {
                 res.status(404).json({ detail: 'No records found' });
             }
@@ -150,7 +157,7 @@ export const like = async (req: Request, res: Response) => {
                     matches: FieldValue.arrayUnion(req.params.userIdBeLiked),
                 });
             }
-            res.status(201).json(user);
+            res.status(204).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -165,7 +172,7 @@ export const ignore = async (req: Request, res: Response) => {
             ignoredUsers: FieldValue.arrayUnion(req.params.userIdBeIgnored),
         })
         .then(user => {
-            res.status(201).json(user);
+            res.status(204).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -179,7 +186,7 @@ export const report = async (req: Request, res: Response) => {
             report: FieldValue.increment(1),
         })
         .then(user => {
-            res.status(201).json(user);
+            res.status(204).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -200,10 +207,7 @@ export const superLike = async (req: Request, res: Response) => {
                     superLike: FieldValue.increment(1),
                 })
                 .then(user => {
-                    res.status(201).json(user);
-                })
-                .catch(err => {
-                    res.status(500).json(err);
+                    res.status(204).json(user);
                 });
         })
         .catch(err => {

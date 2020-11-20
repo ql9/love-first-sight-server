@@ -2,6 +2,7 @@ import express from 'express';
 import * as bodyParser from 'body-parser';
 import * as userController from './controllers/user.controller';
 import * as matchController from './controllers/match.controller';
+// import * as chatController from './controllers/chat.controller';
 
 const app = express();
 
@@ -22,6 +23,9 @@ app.post('/match', matchController.get);
 app.put('/match/like/:userId/:userIdBeLiked', matchController.like);
 app.put('/match/ignore/:userId/:userIdBeIgnored', matchController.ignore);
 app.put('/match/super/:userId/:userIdBeSuperLiked', matchController.superLike);
-app.put('/match/super/:userId/:userIdBeReported', matchController.report);
+app.put('/match/report/:userId/:userIdBeReported', matchController.report);
+
+// Conversation
+// app.get('/conversation/:userId', chatController.con);
 
 export default app;

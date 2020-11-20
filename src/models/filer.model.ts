@@ -1,5 +1,6 @@
 export interface Filter {
     userId: string;
+    preUserId: string;
     gender: string;
     distance: number;
     age: { from: number; to: number };

@@ -50,6 +50,7 @@ export const createUser = async (req: Request, res: Response) => {
         const availableUsers: string[] = [];
         const ignoredUsers: string[] = [];
         const matches: string[] = [];
+        const youLiked: string[] = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: Object is possibly 'null'
         const images: string[] = [null, null, null, null, null, null, null, null];
@@ -63,16 +64,17 @@ export const createUser = async (req: Request, res: Response) => {
             hobbies: req.body.hobbies,
             avatar: req.body.avatar,
             matches: matches,
-            createAt: new Date().getTime(),
+            createdAt: new Date().getTime(),
             availableUsers: availableUsers,
             ignoredUsers: ignoredUsers,
             images: images,
+            youLiked: youLiked,
         } as User;
 
         await usersRef
             .doc(req.body.userId)
             .set(user)
-            .then(async () => {
+            .then(() => {
                 availableUsers.forEach(user => {
                     usersRef.doc(user).update({
                         availableUsers: FieldValue.arrayUnion(req.body.userId),
