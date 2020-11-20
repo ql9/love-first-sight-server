@@ -137,11 +137,13 @@ export const like = async (req: Request, res: Response) => {
         .get()
         .then(user => {
             let flag = false;
-            user.data()!.youLiked.forEach((uid: string) => {
-                if (uid === req.params.userId) {
-                    flag = true;
-                }
-            });
+            if (user.data()!.youLiked) {
+                user.data()!.youLiked.forEach((uid: string) => {
+                    if (uid === req.params.userId) {
+                        flag = true;
+                    }
+                });
+            }
             return flag;
         });
 
@@ -151,13 +153,13 @@ export const like = async (req: Request, res: Response) => {
             youLiked: FieldValue.arrayUnion(req.params.userIdBeLiked),
             availableUsers: FieldValue.arrayRemove(req.params.userIdBeLiked),
         })
-        .then(async user => {
+        .then(async () => {
             if (isLike) {
                 await usersRef.doc(req.params.userId).update({
                     matches: FieldValue.arrayUnion(req.params.userIdBeLiked),
                 });
             }
-            res.status(204).json(user);
+            res.status(204).json('liked');
         })
         .catch(err => {
             res.status(500).json(err);
