@@ -16,8 +16,8 @@ app.delete('/profile/delete/:userId', userController.deleteUser);
 app.post('/profile/send-code', userController.sendCode);
 
 // Add / remove image
-app.put('/profile/add-image/:userId', userController.addImage);
-app.put('/profile/remove-image/:userId', userController.removeImage);
+app.put('/profile/add-image', userController.addImage);
+app.put('/profile/remove-image', userController.removeImage);
 
 // Get list of users
 app.post('/match', matchController.get);
