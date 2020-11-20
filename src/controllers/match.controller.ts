@@ -158,6 +158,9 @@ export const like = async (req: Request, res: Response) => {
                 await usersRef.doc(req.params.userId).update({
                     matches: FieldValue.arrayUnion(req.params.userIdBeLiked),
                 });
+                await usersRef.doc(req.params.userIdBeLiked).update({
+                    matches: FieldValue.arrayUnion(req.params.userId),
+                });
             }
             res.status(204).json('liked');
         })
