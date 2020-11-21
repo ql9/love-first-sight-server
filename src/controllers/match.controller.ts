@@ -170,10 +170,12 @@ export const like = async (req: Request, res: Response) => {
     await usersRef
         .doc(req.params.userIdBeLiked)
         .update({
-            likedUsers: FieldValue.arrayUnion(req.params.userId),
             availableUsers: FieldValue.arrayRemove(req.params.userId),
         })
-        .then(user => {
+        .then(async user => {
+            await usersRef.doc(req.params.userId).update({
+                likedUsers: FieldValue.arrayUnion(req.params.userId),
+            });
             createConversion(req.params.userId, req.params.userIdBeLiked);
             res.status(204).json(user);
         })
@@ -186,10 +188,12 @@ export const ignore = async (req: Request, res: Response) => {
     await usersRef
         .doc(req.params.userIdBeIgnored)
         .update({
-            availableUsers: FieldValue.arrayRemove(req.params.userIdBe),
-            ignoredUsers: FieldValue.arrayUnion(req.params.userIdBe),
+            availableUsers: FieldValue.arrayRemove(req.params.userId),
         })
         .then(user => {
+            usersRef.doc(req.params.userId).update({
+                ignoredUsers: FieldValue.arrayUnion(req.params.userIdBeIgnored),
+            });
             res.status(204).json(user);
         })
         .catch(err => {
@@ -215,19 +219,15 @@ export const superLike = async (req: Request, res: Response) => {
     await usersRef
         .doc(req.params.userIdBeSuperLiked)
         .update({
-            youLiked: FieldValue.arrayUnion(req.params.userId),
+            superLike: FieldValue.increment(1),
             availableUsers: FieldValue.arrayRemove(req.params.userId),
         })
-        .then(async () => {
+        .then(async user => {
+            await usersRef.doc(req.params.userId).update({
+                likedUsers: FieldValue.arrayUnion(req.params.userIdBeSuperLiked),
+            });
             createConversion(req.params.userId, req.params.userIdBeSuperLiked);
-            await usersRef
-                .doc(req.params.userIdBeSuperLiked)
-                .update({
-                    superLike: FieldValue.increment(1),
-                })
-                .then(user => {
-                    res.status(204).json(user);
-                });
+            res.status(204).json(user);
         })
         .catch(err => {
             res.status(500).json(err);

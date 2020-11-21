@@ -35,7 +35,6 @@ export const get = async (req: Request, res: Response) => {
                         const mes: FirebaseFirestore.DocumentData[] = [];
                         messages.forEach(message => {
                             mes.push(message.data());
-                            console.log(message.data());
                         });
                         const users = con.data()!.users;
                         let receiver, sender;
@@ -47,7 +46,7 @@ export const get = async (req: Request, res: Response) => {
                         } else {
                             receiver = users[0];
                             sender = users[1];
-                            sender.name = 'You';
+                            sender.name = receiver.name;
                         }
 
                         if (mes[0].messageType === 'text') {
@@ -75,11 +74,14 @@ export const get = async (req: Request, res: Response) => {
                                 avatar: receiver.avatar,
                             });
                         }
-                    })
-                    .catch(err => console.log(err));
+                    });
 
-                const list = results.sort(compare);
-                res.status(200).json(list);
+                const list = new Promise((resolve, reject) => {
+                    res.status(200).json(results.sort(compare));
+                });
+                list.then(results => {
+                    console.log(results);
+                });
             });
         })
         .catch(err => {
