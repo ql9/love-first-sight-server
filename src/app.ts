@@ -3,6 +3,7 @@ import * as bodyParser from 'body-parser';
 import * as userController from './controllers/user.controller';
 import * as matchController from './controllers/match.controller';
 import * as conversationController from './controllers/conversation.controller';
+import * as likeAndTopController from './controllers/like-top.controller';
 
 const app = express();
 
@@ -25,7 +26,11 @@ app.put('/match/ignore/:userId/:userIdBeIgnored', matchController.ignore);
 app.put('/match/super/:userId/:userIdBeSuperLiked', matchController.superLike);
 app.put('/match/report/:userId/:userIdBeReported', matchController.report);
 
+// List liked you and top pick
+app.get('/match/liked-you/:userId', likeAndTopController.getUsersLiked);
+app.get('/match/top-pick', likeAndTopController.getUsersOnTop);
+
 // Conversation
-app.get('/conversation/:userId', conversationController.get);
+// app.get('/conversation/:userId', conversationController.get);
 
 export default app;
