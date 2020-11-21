@@ -14,7 +14,7 @@ export interface User {
     hobbies: Array<string>;
     kids: boolean;
     avatar: string;
-    youLiked: Array<string>;
+    likedUsers: Array<string>;
     images: Array<string>;
     matches: Array<string>;
     messages: Array<string>;

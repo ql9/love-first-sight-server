@@ -50,7 +50,7 @@ export const createUser = async (req: Request, res: Response) => {
         const availableUsers: string[] = [];
         const ignoredUsers: string[] = [];
         const matches: string[] = [];
-        const youLiked: string[] = [];
+        const likedUsers: string[] = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: Object is possibly 'null'
         const images: string[] = [null, null, null, null, null, null, null, null];
@@ -68,7 +68,7 @@ export const createUser = async (req: Request, res: Response) => {
             availableUsers: availableUsers,
             ignoredUsers: ignoredUsers,
             images: images,
-            youLiked: youLiked,
+            likedUsers: likedUsers,
         } as User;
 
         await usersRef

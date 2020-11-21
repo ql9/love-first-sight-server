@@ -5,7 +5,7 @@ const usersRef = db.collection('users');
 
 export const getUsersLiked = async (req: Request, res: Response) => {
     await usersRef
-        .where('youLiked', 'array-contains', req.params.userId)
+        .where('likedUsers', 'array-contains', req.params.userId)
         .get()
         .then(users => {
             const results: {

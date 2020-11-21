@@ -1,8 +1,11 @@
 import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Filter } from '../models/filer.model';
+import { Conversation } from '../models/conversation.model';
+// import { con } from './chat.controller';
 
 const usersRef = db.collection('users');
+const conversationsRef = db.collection('conversations');
 
 function getDistance(coordinates1: { lat: number; long: number }, coordinates2: { lat: number; long: number }) {
     const R = 6371; // Radius of the earth in km
@@ -26,11 +29,30 @@ function computeAge(birthday: string) {
     return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
+async function createConversion(userId: string, userIdBeLiked: string) {
+    const user = await usersRef.doc(userId).get();
+    console.log(user.data()!.likedUsers);
+    const likedUsers = user.data()!.likedUsers;
+
+    likedUsers.forEach(async (uid: string) => {
+        if (uid === userIdBeLiked) {
+            const conversation = {
+                participants: [userId, userIdBeLiked],
+                state: false,
+            } as Conversation;
+            await conversationsRef.add(conversation).then(con => {
+                console.log(con.id);
+            });
+        }
+    });
+}
+
 export const get = async (req: Request, res: Response) => {
     const filter = req.body as Filter;
 
     const currentUser = await usersRef.doc(filter.userId).get();
     // const previousUser = await usersRef.doc(filter.preUserId).get();
+    console.log(typeof filter.userId);
 
     await usersRef
         .where('availableUsers', 'array-contains', filter.userId)
@@ -132,37 +154,15 @@ export const get = async (req: Request, res: Response) => {
 };
 
 export const like = async (req: Request, res: Response) => {
-    const isLike = await usersRef
-        .doc(req.params.userIdBeLiked)
-        .get()
-        .then(user => {
-            let flag = false;
-            if (user.data()!.youLiked) {
-                user.data()!.youLiked.forEach((uid: string) => {
-                    if (uid === req.params.userId) {
-                        flag = true;
-                    }
-                });
-            }
-            return flag;
-        });
-
     await usersRef
-        .doc(req.params.userId)
+        .doc(req.params.userIdBeLiked)
         .update({
-            youLiked: FieldValue.arrayUnion(req.params.userIdBeLiked),
-            availableUsers: FieldValue.arrayRemove(req.params.userIdBeLiked),
+            likedUsers: FieldValue.arrayUnion(req.params.userId),
+            availableUsers: FieldValue.arrayRemove(req.params.userId),
         })
-        .then(async () => {
-            if (isLike) {
-                await usersRef.doc(req.params.userId).update({
-                    matches: FieldValue.arrayUnion(req.params.userIdBeLiked),
-                });
-                await usersRef.doc(req.params.userIdBeLiked).update({
-                    matches: FieldValue.arrayUnion(req.params.userId),
-                });
-            }
-            res.status(204).json('liked');
+        .then(user => {
+            createConversion(req.params.userId, req.params.userIdBeLiked);
+            res.status(204).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -171,10 +171,10 @@ export const like = async (req: Request, res: Response) => {
 
 export const ignore = async (req: Request, res: Response) => {
     await usersRef
-        .doc(req.params.userId)
+        .doc(req.params.userIdBeIgnored)
         .update({
-            availableUsers: FieldValue.arrayRemove(req.params.userIdBeIgnored),
-            ignoredUsers: FieldValue.arrayUnion(req.params.userIdBeIgnored),
+            availableUsers: FieldValue.arrayRemove(req.params.userIdBe),
+            ignoredUsers: FieldValue.arrayUnion(req.params.userIdBe),
         })
         .then(user => {
             res.status(204).json(user);
@@ -200,12 +200,13 @@ export const report = async (req: Request, res: Response) => {
 
 export const superLike = async (req: Request, res: Response) => {
     await usersRef
-        .doc(req.params.userId)
+        .doc(req.params.userIdBeSuperLiked)
         .update({
-            youLiked: FieldValue.arrayUnion(req.params.userIdBeSuperLiked),
-            availableUsers: FieldValue.arrayRemove(req.params.userIdBeSuperLiked),
+            youLiked: FieldValue.arrayUnion(req.params.userId),
+            availableUsers: FieldValue.arrayRemove(req.params.userId),
         })
         .then(async () => {
+            createConversion(req.params.userId, req.params.userIdBeSuperLiked);
             await usersRef
                 .doc(req.params.userIdBeSuperLiked)
                 .update({
