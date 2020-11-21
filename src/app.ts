@@ -31,6 +31,6 @@ app.get('/match/liked-you/:userId', likeAndTopController.getUsersLiked);
 app.get('/match/top-pick', likeAndTopController.getUsersOnTop);
 
 // Conversation
-// app.get('/conversation/:userId', conversationController.get);
+app.get('/conversation/:userId', conversationController.get);
 
 export default app;

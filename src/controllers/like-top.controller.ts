@@ -14,7 +14,13 @@ export const getUsersLiked = async (req: Request, res: Response) => {
             }[] = [];
             users.forEach(user => results.push({ userId: user.id, data: user.data() }));
             if (results.length) {
-                res.status(200).json(results);
+                const list = results.map(user => {
+                    return {
+                        userId: user.userId,
+                        ...user.data,
+                    };
+                });
+                res.status(200).json(list);
             } else {
                 res.status(404).json({ detail: 'No records found' });
             }
@@ -36,7 +42,13 @@ export const getUsersOnTop = async (req: Request, res: Response) => {
             }[] = [];
             users.forEach(user => results.push({ userId: user.id, data: user.data() }));
             if (results.length) {
-                res.status(200).json(results);
+                const list = results.map(user => {
+                    return {
+                        userId: user.userId,
+                        ...user.data,
+                    };
+                });
+                res.status(200).json(list);
             } else {
                 res.status(404).json({ detail: 'No records found' });
             }

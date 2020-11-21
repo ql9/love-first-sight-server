@@ -31,7 +31,8 @@ function computeAge(birthday: string) {
 
 async function createConversion(userId: string, userIdBeLiked: string) {
     const user = await usersRef.doc(userId).get();
-    console.log(user.data()!.likedUsers);
+    const userBeLiked = await usersRef.doc(userIdBeLiked).get();
+
     const likedUsers = user.data()!.likedUsers;
 
     likedUsers.forEach(async (uid: string) => {
@@ -39,6 +40,18 @@ async function createConversion(userId: string, userIdBeLiked: string) {
             const conversation = {
                 participants: [userId, userIdBeLiked],
                 state: false,
+                users: [
+                    {
+                        userId: userId,
+                        name: user.data()!.name,
+                        avatar: user.data()!.avatar,
+                    },
+                    {
+                        userId: userIdBeLiked,
+                        name: userBeLiked.data()!.name,
+                        avatar: userBeLiked.data()!.avatar,
+                    },
+                ],
             } as Conversation;
             await conversationsRef.add(conversation).then(con => {
                 console.log(con.id);
