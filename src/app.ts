@@ -2,7 +2,7 @@ import express from 'express';
 import * as bodyParser from 'body-parser';
 import * as userController from './controllers/user.controller';
 import * as matchController from './controllers/match.controller';
-// import * as chatController from './controllers/chat.controller';
+import * as conversationController from './controllers/conversation.controller';
 
 const app = express();
 
@@ -26,6 +26,6 @@ app.put('/match/super/:userId/:userIdBeSuperLiked', matchController.superLike);
 app.put('/match/report/:userId/:userIdBeReported', matchController.report);
 
 // Conversation
-// app.get('/conversation/:userId', chatController.con);
+app.get('/conversation/:userId', conversationController.get);
 
 export default app;
