@@ -29,8 +29,7 @@ app.put('/match/report/:userId/:userIdBeReported', matchController.report);
 // List liked you and top pick
 app.get('/match/liked-you/:userId', likeAndTopController.getUsersLiked);
 app.get('/match/top-pick', likeAndTopController.getUsersOnTop);
-
 // Conversation
-app.get('/conversation/:userId', conversationController.get);
+app.get('/conversation/:userId/:state', conversationController.get);
 
 export default app;

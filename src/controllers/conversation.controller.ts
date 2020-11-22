@@ -1,6 +1,6 @@
 import { db } from '../config/firebase';
 import { Request, Response } from 'express';
-import { InformationConversion } from '../models/conversation.model';
+// import { InformationConversion } from '../models/conversation.model';
 
 const conversationsRef = db.collection('conversations');
 
@@ -19,69 +19,87 @@ function splitName(name: string) {
 }
 
 export const get = async (req: Request, res: Response) => {
+    let state = true;
+    if (req.params.state === 'false') {
+        state = false;
+    }
     await conversationsRef
         .where('participants', 'array-contains', req.params.userId)
+        .where('state', '==', state)
         .get()
-        .then(cons => {
-            const results: InformationConversion[] = [];
+        .then(async cons => {
+            console.log(cons.size);
+            if (cons.size == 0) {
+                res.status(404).json('404 Not Found');
+            }
+            const results: (void | { conversationId: string; lastModified: any; text: any; name: any; avatar: any })[] = [];
             cons.forEach(async con => {
-                await conversationsRef
-                    .doc(con.id)
-                    .collection('messages')
-                    .orderBy('createdAt', 'desc')
-                    .limit(1)
-                    .get()
-                    .then(messages => {
-                        const mes: FirebaseFirestore.DocumentData[] = [];
-                        messages.forEach(message => {
-                            mes.push(message.data());
-                        });
-                        const users = con.data()!.users;
-                        let receiver, sender;
-
-                        if (users[0]._id === req.params.userId) {
-                            receiver = users[1];
-                            sender = users[0];
-                            sender.name = 'You';
-                        } else {
-                            receiver = users[0];
-                            sender = users[1];
-                            sender.name = receiver.name;
-                        }
-
-                        if (mes[0].messageType === 'text') {
-                            results.push({
-                                conversationId: con.id,
-                                lastModified: mes[0].createdAt,
-                                text: mes[0].text,
-                                name: receiver.name,
-                                avatar: receiver.avatar,
+                const length = cons.size;
+                results.push(
+                    await conversationsRef
+                        .doc(con.id)
+                        .collection('messages')
+                        .orderBy('createdAt', 'desc')
+                        .limit(1)
+                        .get()
+                        .then(messages => {
+                            const mes: FirebaseFirestore.DocumentData[] = [];
+                            messages.forEach(message => {
+                                mes.push(message.data());
                             });
-                        } else if (mes[0].messageType === 'audio') {
-                            results.push({
-                                conversationId: con.id,
-                                lastModified: mes[0].createdAt,
-                                text: splitName(sender.name) + ' sent a voice message.',
-                                name: receiver.name,
-                                avatar: receiver.avatar,
-                            });
-                        } else {
-                            results.push({
-                                conversationId: con.id,
-                                lastModified: mes[0].createdAt,
-                                text: splitName(sender.name) + ' sent an image.',
-                                name: receiver.name,
-                                avatar: receiver.avatar,
-                            });
-                        }
-                    });
+                            const users = con.data()!.users;
+                            let receiver, sender;
 
-                const list = new Promise((resolve, reject) => {
+                            if (users[0]._id === req.params.userId) {
+                                receiver = users[1];
+                                sender = users[0];
+                                sender.name = 'You';
+                            } else {
+                                receiver = users[0];
+                                sender = users[1];
+                                sender.name = receiver.name;
+                            }
+                            if (mes.length) {
+                                if (mes[0].messageType === 'text') {
+                                    return {
+                                        conversationId: con.id,
+                                        lastModified: mes[0].createdAt,
+                                        text: mes[0].text,
+                                        name: receiver.name,
+                                        avatar: receiver.avatar,
+                                    };
+                                } else if (mes[0].messageType === 'audio') {
+                                    return {
+                                        conversationId: con.id,
+                                        lastModified: mes[0].createdAt,
+                                        text: splitName(sender.name) + ' sent a voice message.',
+                                        name: receiver.name,
+                                        avatar: receiver.avatar,
+                                    };
+                                } else {
+                                    return {
+                                        conversationId: con.id,
+                                        lastModified: mes[0].createdAt,
+                                        text: splitName(sender.name) + ' sent an image.',
+                                        name: receiver.name,
+                                        avatar: receiver.avatar,
+                                    };
+                                }
+                            } else {
+                                return {
+                                    conversationId: con.id,
+                                    lastModified: new Date().getTime(),
+                                    text: 'You matched ' + splitName(sender.name),
+                                    name: receiver.name,
+                                    avatar: receiver.avatar,
+                                };
+                            }
+                        })
+                        .catch(err => console.log(err)),
+                );
+                if (results.length === length) {
                     res.status(200).json(results.sort(compare));
-                });
-                list.then(results => {
-                    console.log(results);
-                });
+                }
             });
         })
         .catch(err => {

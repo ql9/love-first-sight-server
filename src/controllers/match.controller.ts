@@ -33,7 +33,7 @@ async function createConversion(userId: string, userIdBeLiked: string) {
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
 
-    const likedUsers = user.data()!.likedUsers;
+    const likedUsers = userBeLiked.data()!.likedUsers;
 
     likedUsers.forEach(async (uid: string) => {
         if (uid === userIdBeLiked) {
