@@ -1,15 +1,14 @@
 import { db } from '../config/firebase';
 import { Request, Response } from 'express';
-// import { InformationConversion } from '../models/conversation.model';
 
 const conversationsRef = db.collection('conversations');
 
 function compare(a: any, b: any) {
     if (a.lastModified < b.lastModified) {
-        return -1;
+        return 1;
     }
     if (a.lastModified > b.lastModified) {
-        return 1;
+        return -1;
     }
     return 0;
 }
