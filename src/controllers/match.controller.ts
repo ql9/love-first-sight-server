@@ -52,6 +52,7 @@ async function createConversion(userId: string, userIdBeLiked: string) {
                         avatar: userBeLiked.data()!.avatar,
                     },
                 ],
+                matchedAt: new Date().getTime(),
             } as Conversation;
             await conversationsRef.add(conversation).then(con => {
                 console.log(con.id);

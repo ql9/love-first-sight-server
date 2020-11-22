@@ -28,7 +28,6 @@ export const get = async (req: Request, res: Response) => {
         .where('state', '==', state)
         .get()
         .then(async cons => {
-            console.log(cons.size);
             if (cons.size == 0) {
                 res.status(404).json('404 Not Found');
             }
@@ -88,7 +87,7 @@ export const get = async (req: Request, res: Response) => {
                             } else {
                                 return {
                                     conversationId: con.id,
-                                    lastModified: new Date().getTime(),
+                                    lastModified: con.data()!.matchedAt,
                                     text: 'You matched ' + splitName(sender.name),
                                     name: receiver.name,
                                     avatar: receiver.avatar,
