@@ -63,6 +63,7 @@ export const createUser = async (req: Request, res: Response) => {
             gender: req.body.gender,
             hobbies: req.body.hobbies,
             avatar: req.body.avatar,
+            superLike: 0,
             matches: matches,
             createdAt: new Date().getTime(),
             availableUsers: availableUsers,

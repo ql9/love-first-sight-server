@@ -174,7 +174,7 @@ export const like = async (req: Request, res: Response) => {
         })
         .then(async user => {
             await usersRef.doc(req.params.userId).update({
-                likedUsers: FieldValue.arrayUnion(req.params.userId),
+                likedUsers: FieldValue.arrayUnion(req.params.userIdBeLiked),
             });
             createConversion(req.params.userId, req.params.userIdBeLiked);
             res.status(204).json(user);
