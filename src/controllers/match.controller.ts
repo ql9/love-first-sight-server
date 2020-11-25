@@ -36,7 +36,7 @@ async function createConversion(userId: string, userIdBeLiked: string) {
     const likedUsers = userBeLiked.data()!.likedUsers;
 
     likedUsers.forEach(async (uid: string) => {
-        if (uid === userIdBeLiked) {
+        if (uid === userId) {
             const conversation = {
                 participants: [userId, userIdBeLiked],
                 state: false,
