@@ -48,7 +48,7 @@ export const get = async (req: Request, res: Response) => {
                             const users = con.data()!.users;
                             let receiver, sender;
 
-                            if (users[0]._id === req.params.userId) {
+                            if (users[0].userId === req.params.userId) {
                                 receiver = users[1];
                                 sender = users[0];
                                 sender.name = 'You';
