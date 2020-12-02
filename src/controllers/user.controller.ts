@@ -48,7 +48,7 @@ export const sendCode = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
     await usersRef.get().then(async users => {
         const availableUsers: string[] = [];
-        const ignoredUsers: string[] = [];
+        const ignoredYou: string[] = [];
         const matches: string[] = [];
         const likedUsers: string[] = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -67,7 +67,7 @@ export const createUser = async (req: Request, res: Response) => {
             matches: matches,
             createdAt: new Date().getTime(),
             availableUsers: availableUsers,
-            ignoredUsers: ignoredUsers,
+            ignoredYou: ignoredYou,
             images: images,
             likedUsers: likedUsers,
         } as User;

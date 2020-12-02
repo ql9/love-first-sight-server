@@ -87,7 +87,7 @@ export const get = async (req: Request, res: Response) => {
                                 return {
                                     conversationId: con.id,
                                     lastModified: con.data()!.matchedAt,
-                                    text: 'You matched ' + splitName(sender.name),
+                                    text: 'You matched ' + splitName(receiver.name),
                                     name: receiver.name,
                                     avatar: receiver.avatar,
                                 };

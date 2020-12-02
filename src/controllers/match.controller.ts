@@ -190,11 +190,9 @@ export const ignore = async (req: Request, res: Response) => {
         .doc(req.params.userIdBeIgnored)
         .update({
             availableUsers: FieldValue.arrayRemove(req.params.userId),
+            ignoredYou: FieldValue.arrayUnion(req.params.userId),
         })
         .then(user => {
-            usersRef.doc(req.params.userId).update({
-                ignoredUsers: FieldValue.arrayUnion(req.params.userIdBeIgnored),
-            });
             res.status(204).json(user);
         })
         .catch(err => {
