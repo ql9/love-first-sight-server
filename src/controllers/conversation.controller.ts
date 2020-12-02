@@ -65,6 +65,7 @@ export const get = async (req: Request, res: Response) => {
                                         text: mes[0].text,
                                         name: receiver.name,
                                         avatar: receiver.avatar,
+                                        userId: receiver.userId,
                                     };
                                 } else if (mes[0].messageType === 'audio') {
                                     return {
@@ -73,6 +74,7 @@ export const get = async (req: Request, res: Response) => {
                                         text: splitName(sender.name) + ' sent a voice message.',
                                         name: receiver.name,
                                         avatar: receiver.avatar,
+                                        userId: receiver.userId,
                                     };
                                 } else {
                                     return {
@@ -81,6 +83,7 @@ export const get = async (req: Request, res: Response) => {
                                         text: splitName(sender.name) + ' sent an image.',
                                         name: receiver.name,
                                         avatar: receiver.avatar,
+                                        userId: receiver.userId,
                                     };
                                 }
                             } else {
@@ -90,6 +93,7 @@ export const get = async (req: Request, res: Response) => {
                                     text: 'You matched ' + splitName(receiver.name),
                                     name: receiver.name,
                                     avatar: receiver.avatar,
+                                    userId: receiver.userId,
                                 };
                             }
                         })
