@@ -9,5 +9,6 @@ admin.initializeApp({
 
 export const db = admin.firestore();
 export const st = admin.storage();
+export const ms = admin.messaging();
 export const FieldValue = admin.firestore.FieldValue;
 export const documentId = admin.firestore.FieldPath.documentId();

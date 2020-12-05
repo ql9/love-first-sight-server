@@ -4,6 +4,7 @@ import * as userController from './controllers/user.controller';
 import * as matchController from './controllers/match.controller';
 import * as conversationController from './controllers/conversation.controller';
 import * as likeAndTopController from './controllers/like-top-ignore.controller';
+import * as notification from './controllers/notification.controller';
 
 const app = express();
 
@@ -33,5 +34,9 @@ app.get('/list/ignored/:userId', likeAndTopController.getUsersIgnored);
 
 // Conversation
 app.get('/conversation/:userId/:state', conversationController.get);
+
+// Notification
+app.get('/notification/message/:ownerId/:userId/:message', notification.onUserSendMessage);
+app.get('/notification/like/:ownerId/:userId', notification.onUserPressLike);
 
 export default app;
