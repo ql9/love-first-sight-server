@@ -67,7 +67,7 @@ export const get = async (req: Request, res: Response) => {
                                         lastModified: mes[0].createdAt,
                                         text: mes[0].text,
                                         name: receiver.name,
-                                        avatar: mes[0].user.avatar,
+                                        avatar: receiver.avatar,
                                         userId: receiver.userId,
                                     };
                                 } else if (mes[0].messageType === 'audio') {
@@ -76,7 +76,7 @@ export const get = async (req: Request, res: Response) => {
                                         lastModified: mes[0].createdAt,
                                         text: splitName(sender.name) + ' sent a voice message.',
                                         name: receiver.name,
-                                        avatar: mes[0].user.avatar,
+                                        avatar: receiver.avatar,
                                         userId: receiver.userId,
                                     };
                                 } else {
@@ -85,7 +85,7 @@ export const get = async (req: Request, res: Response) => {
                                         lastModified: mes[0].createdAt,
                                         text: splitName(sender.name) + ' sent an image.',
                                         name: receiver.name,
-                                        avatar: mes[0].user.avatar,
+                                        avatar: receiver.avatar,
                                         userId: receiver.userId,
                                     };
                                 }
