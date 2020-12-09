@@ -51,20 +51,23 @@ export const get = async (req: Request, res: Response) => {
                             if (users[0].userId === req.params.userId) {
                                 receiver = users[1];
                                 sender = users[0];
-                                sender.name = 'You';
                             } else {
                                 receiver = users[0];
                                 sender = users[1];
-                                sender.name = receiver.name;
                             }
                             if (mes.length) {
+                                if (mes[0].user._id === req.params.userId) {
+                                    sender.name = 'You';
+                                } else {
+                                    sender.name = receiver.name;
+                                }
                                 if (mes[0].messageType === 'text') {
                                     return {
                                         conversationId: con.id,
                                         lastModified: mes[0].createdAt,
                                         text: mes[0].text,
                                         name: receiver.name,
-                                        avatar: receiver.avatar,
+                                        avatar: mes[0].user.avatar,
                                         userId: receiver.userId,
                                     };
                                 } else if (mes[0].messageType === 'audio') {
@@ -73,7 +76,7 @@ export const get = async (req: Request, res: Response) => {
                                         lastModified: mes[0].createdAt,
                                         text: splitName(sender.name) + ' sent a voice message.',
                                         name: receiver.name,
-                                        avatar: receiver.avatar,
+                                        avatar: mes[0].user.avatar,
                                         userId: receiver.userId,
                                     };
                                 } else {
@@ -82,7 +85,7 @@ export const get = async (req: Request, res: Response) => {
                                         lastModified: mes[0].createdAt,
                                         text: splitName(sender.name) + ' sent an image.',
                                         name: receiver.name,
-                                        avatar: receiver.avatar,
+                                        avatar: mes[0].user.avatar,
                                         userId: receiver.userId,
                                     };
                                 }
