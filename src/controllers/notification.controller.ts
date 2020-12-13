@@ -36,6 +36,9 @@ export const onUserSendMessage = async (req: Request, res: Response) => {
                     image: 'https://i.pinimg.com/originals/d5/5e/fc/d55efcc94b469ad21115c1d7fb9f0631.jpg',
                     sound: 'default',
                 },
+                data: {
+                    type: 'Chat',
+                },
             },
             {
                 // Required for background/quit data-only messages on iOS
