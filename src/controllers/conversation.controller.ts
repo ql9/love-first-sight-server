@@ -51,13 +51,16 @@ export const get = async (req: Request, res: Response) => {
                             if (users[0].userId === req.params.userId) {
                                 receiver = users[1];
                                 sender = users[0];
-                                sender.name = 'You';
                             } else {
                                 receiver = users[0];
                                 sender = users[1];
-                                sender.name = receiver.name;
                             }
                             if (mes.length) {
+                                if (mes[0].user._id === req.params.userId) {
+                                    sender.name = 'You';
+                                } else {
+                                    sender.name = receiver.name;
+                                }
                                 if (mes[0].messageType === 'text') {
                                     return {
                                         conversationId: con.id,
