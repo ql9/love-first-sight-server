@@ -38,6 +38,14 @@ export const onUserSendMessage = async (req: Request, res: Response) => {
                 },
                 data: {
                     type: 'Chat',
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore: Object is possibly 'null'.
+                    name: user.name,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore: Object is possibly 'null'.
+                    avatar: user.avatar,
+                    conversationId: req.params.conversationId,
+                    ownerId: req.params.userId,
                 },
             },
             {

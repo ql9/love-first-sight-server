@@ -36,7 +36,7 @@ app.get('/list/ignored/:userId', likeAndTopController.getUsersIgnored);
 app.get('/conversation/:userId/:state', conversationController.get);
 
 // Notification
-app.get('/notification/message/:ownerId/:userId/:message', notification.onUserSendMessage);
+app.get('/notification/message/:ownerId/:userId/:message/:conversationId', notification.onUserSendMessage);
 app.get('/notification/like/:ownerId/:userId', notification.onUserPressLike);
 
 export default app;
