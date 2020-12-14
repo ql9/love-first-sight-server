@@ -92,6 +92,10 @@ export const onUserPressLike = async (req: Request, res: Response) => {
                     // @ts-ignore: Object is possibly 'null'.
                     sound: 'default',
                 },
+                data: {
+                    type: 'ProfileScreen',
+                    userId: req.params.userId,
+                },
             },
             {
                 // Required for background/quit data-only messages on iOS
