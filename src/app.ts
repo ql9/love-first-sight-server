@@ -2,8 +2,9 @@ import express from 'express';
 import * as bodyParser from 'body-parser';
 import * as userController from './controllers/user.controller';
 import * as matchController from './controllers/match.controller';
+import * as secondLookController from './controllers/second-look.controller';
 import * as conversationController from './controllers/conversation.controller';
-import * as likeAndTopController from './controllers/like-top-ignore.controller';
+import * as listController from './controllers/list.controller';
 import * as notification from './controllers/notification.controller';
 
 const app = express();
@@ -23,14 +24,23 @@ app.post('/match', matchController.get);
 
 // Like / ignore / super like / report
 app.put('/match/like/:userId/:userIdBeLiked', matchController.like);
+app.put('/match/unmatch/:userId/:userIdBeUnMatch', matchController.unMatch);
 app.put('/match/ignore/:userId/:userIdBeIgnored', matchController.ignore);
 app.put('/match/super/:userId/:userIdBeSuperLiked', matchController.superLike);
 app.put('/match/report/:userId/:userIdBeReported', matchController.report);
+app.put('/match/block/:userId/:userIdBeBlock', matchController.block);
+app.put('/match/unblock/:userId/:userIdBeUnBlock', matchController.unBlock);
 
 // List liked you, top pick and ignored
-app.get('/list/liked-you/:userId', likeAndTopController.getUsersLiked);
-app.get('/list/top-pick/:userId', likeAndTopController.getUsersOnTop);
-app.get('/list/ignored/:userId', likeAndTopController.getUsersIgnored);
+app.get('/list/liked-you/:userId', listController.getUsersLiked);
+app.get('/list/top-pick/:userId', listController.getUsersOnTop);
+app.get('/list/ignored/:userId', listController.getUsersIgnored);
+app.get('/list/block/:userId', listController.getUsersBlock);
+
+//Second look
+app.put('/second-look/like/:userId/:userIdBeLiked', secondLookController.like);
+app.put('/second-look/ignore/:userId/:userIdBeIgnored', secondLookController.ignore);
+app.put('/second-look/super/:userId/:userIdBeSuperLiked', secondLookController.superLike);
 
 // Conversation
 app.get('/conversation/:userId/:state', conversationController.get);

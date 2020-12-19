@@ -29,7 +29,7 @@ function computeAge(birthday: string) {
     return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-async function createConversion(userId: string, userIdBeLiked: string) {
+export async function createConversion(userId: string, userIdBeLiked: string) {
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
 
@@ -226,6 +226,56 @@ export const superLike = async (req: Request, res: Response) => {
                 likedUsers: FieldValue.arrayUnion(req.params.userIdBeSuperLiked),
             });
             createConversion(req.params.userId, req.params.userIdBeSuperLiked);
+            res.status(204).json(user);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const unMatch = async (req: Request, res: Response) => {
+    const { userId, userIdBeUnMatch } = req.params;
+    await usersRef
+        .doc(userIdBeUnMatch)
+        .update({
+            availableUsers: FieldValue.arrayUnion(userId),
+        })
+        .then(async user => {
+            await usersRef.doc(userId).update({
+                likedUsers: FieldValue.arrayRemove(userIdBeUnMatch),
+            });
+            res.status(204).json(user);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const block = async (req: Request, res: Response) => {
+    const { userId, userIdBeBlock } = req.params;
+    await usersRef
+        .doc(userIdBeBlock)
+        .update({
+            availableUsers: FieldValue.arrayRemove(userId),
+            blockedYou: FieldValue.arrayUnion(userId),
+        })
+        .then(user => {
+            res.status(204).json(user);
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
+
+export const unBlock = async (req: Request, res: Response) => {
+    const { userId, userIdBeUnBlock } = req.params;
+    await usersRef
+        .doc(userIdBeUnBlock)
+        .update({
+            availableUsers: FieldValue.arrayUnion(userId),
+            blockedYou: FieldValue.arrayRemove(userId),
+        })
+        .then(user => {
             res.status(204).json(user);
         })
         .catch(err => {

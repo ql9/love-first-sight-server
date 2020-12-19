@@ -20,6 +20,7 @@ export interface User {
     messages: Array<string>;
     availableUsers: Array<string>;
     ignoredYou: Array<string>;
+    blockedYou: Array<string>;
     createdAt: number;
     report: number;
     coordinates: { lat: number; long: number };

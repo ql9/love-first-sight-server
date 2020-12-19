@@ -95,3 +95,30 @@ export const getUsersIgnored = async (req: Request, res: Response) => {
             res.status(500).json(err);
         });
 };
+
+export const getUsersBlock = async (req: Request, res: Response) => {
+    await usersRef
+        .where('blockedYou', 'array-contains', req.params.userId)
+        .get()
+        .then(users => {
+            const results: {
+                userId: string;
+                data: FirebaseFirestore.DocumentData;
+            }[] = [];
+            users.forEach(user => results.push({ userId: user.id, data: user.data() }));
+            if (results.length) {
+                const list = results.map(user => {
+                    return {
+                        userId: user.userId,
+                        ...user.data,
+                    };
+                });
+                res.status(200).json(list);
+            } else {
+                res.status(404).json({ detail: 'No records found' });
+            }
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
+};
