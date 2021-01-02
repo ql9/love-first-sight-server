@@ -2,8 +2,11 @@ import { User } from '../models/user.model';
 import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const usersRef = db.collection('users');
+const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -15,6 +18,21 @@ const transporter = nodemailer.createTransport({
 function randomCode() {
     return Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
 }
+
+const getAddressFromCoordinates = (coordinates: any) => {
+    return new Promise<void>(resolve => {
+        const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${HERE_API_KEY}&mode=retrieveAddresses&prox=${coordinates.lat},${coordinates.long}`;
+        axios
+            .get(url)
+            .then(res => {
+                resolve(res.data.Response.View[0].Result[0].Location.Address.City);
+            })
+            .catch(err => {
+                console.log(err);
+                resolve();
+            });
+    });
+};
 
 export const sendCode = async (req: Request, res: Response) => {
     await usersRef
@@ -97,15 +115,17 @@ export const getUser = async (req: Request, res: Response) => {
     await usersRef
         .doc(req.params.userId)
         .get()
-        .then(user => {
+        .then(async user => {
             if (user.exists) {
-                res.status(200).json(user.data());
+                console.log(await getAddressFromCoordinates(user.data()!.coordinates));
+                const data = {
+                    location: await getAddressFromCoordinates(user.data()!.coordinates),
+                    ...user.data(),
+                };
+                res.status(200).json(data);
             } else {
                 res.status(404).json({ detail: 'Not found user' });
             }
-        })
-        .catch(err => {
-            res.status(500).json(err);
         });
 };
 
