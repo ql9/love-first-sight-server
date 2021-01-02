@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import axios from 'axios';
 
 const usersRef = db.collection('users');
-const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
+// const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -21,14 +21,27 @@ function randomCode() {
 
 const getAddressFromCoordinates = (coordinates: any) => {
     return new Promise<void>(resolve => {
-        const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${HERE_API_KEY}&mode=retrieveAddresses&prox=${coordinates.lat},${coordinates.long}`;
+        const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo&mode=retrieveAddresses&prox=${coordinates.lat},${coordinates.long}`;
         axios
             .get(url)
-            .then(res => {
-                resolve(res.data.Response.View[0].Result[0].Location.Address.City);
+            .then(res => res.data)
+            .then(resJson => {
+                // the response had a deeply nested structure :/
+                if (
+                    resJson &&
+                    resJson.Response &&
+                    resJson.Response.View &&
+                    resJson.Response.View[0] &&
+                    resJson.Response.View[0].Result &&
+                    resJson.Response.View[0].Result[0]
+                ) {
+                    resolve(resJson.Response.View[0].Result[0].Location.Address.City);
+                } else {
+                    resolve();
+                }
             })
-            .catch(err => {
-                console.log(err);
+            .catch(e => {
+                console.log('Error in getAddressFromCoordinates', e);
                 resolve();
             });
     });
@@ -117,7 +130,6 @@ export const getUser = async (req: Request, res: Response) => {
         .get()
         .then(async user => {
             if (user.exists) {
-                console.log(await getAddressFromCoordinates(user.data()!.coordinates));
                 const data = {
                     location: await getAddressFromCoordinates(user.data()!.coordinates),
                     ...user.data(),
