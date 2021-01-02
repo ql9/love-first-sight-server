@@ -2,10 +2,10 @@ import { User } from '../models/user.model';
 import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
-import axios from 'axios';
+import fetch from 'node-fetch';
 
 const usersRef = db.collection('users');
-// const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
+const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -21,10 +21,9 @@ function randomCode() {
 
 const getAddressFromCoordinates = (coordinates: any) => {
     return new Promise<void>(resolve => {
-        const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo&mode=retrieveAddresses&prox=${coordinates.lat},${coordinates.long}`;
-        axios
-            .get(url)
-            .then(res => res.data)
+        const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${HERE_API_KEY}&mode=retrieveAddresses&prox=${coordinates.lat},${coordinates.long}`;
+        fetch(url)
+            .then(res => res.json())
             .then(resJson => {
                 // the response had a deeply nested structure :/
                 if (
