@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import fetch from 'node-fetch';
 
 const usersRef = db.collection('users');
-const HERE_API_KEY = 'TqNeLBqGpLuhmhlwEh71T9m9nfpVZPGF9Jz6O6RuObo';
+const HERE_API_KEY = 'q7ZExJiY6fZe7tWwSfbnZdIROAQAIB46WgXqZ1eYWXs';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
