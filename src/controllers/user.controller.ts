@@ -128,6 +128,7 @@ export const getUser = async (req: Request, res: Response) => {
         .doc(req.params.userId)
         .get()
         .then(async user => {
+            console.log(await getAddressFromCoordinates(user.data()!.coordinates));
             if (user.exists) {
                 const data = {
                     location: await getAddressFromCoordinates(user.data()!.coordinates),
