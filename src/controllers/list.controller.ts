@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 const usersRef = db.collection('users');
 
-function compare(a: any, b: any) {
+const compare = (a: any, b: any) => {
     if (a.superLike < b.superLike) {
         return 1;
     }
@@ -11,7 +11,7 @@ function compare(a: any, b: any) {
         return -1;
     }
     return 0;
-}
+};
 
 export const getUsersLiked = async (req: Request, res: Response) => {
     await usersRef

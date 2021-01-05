@@ -5,7 +5,7 @@ import * as matchController from './controllers/match.controller';
 import * as secondLookController from './controllers/second-look.controller';
 import * as conversationController from './controllers/conversation.controller';
 import * as listController from './controllers/list.controller';
-import * as notification from './controllers/notification.controller';
+import * as notificationController from './controllers/notification.controller';
 
 const app = express();
 
@@ -45,8 +45,11 @@ app.put('/second-look/super/:userId/:userIdBeSuperLiked', secondLookController.s
 // Conversation
 app.get('/conversation/:userId/:state', conversationController.get);
 
+// Message request
+app.post('/conversation/send-message', conversationController.sendMessageRequest);
+
 // Notification
-app.get('/notification/message/:ownerId/:userId/:message/:conversationId', notification.onUserSendMessage);
-app.get('/notification/like/:ownerId/:userId', notification.onUserPressLike);
+app.get('/notification/message/:ownerId/:userId/:message/:conversationId', notificationController.onUserSendMessage);
+app.get('/notification/like/:ownerId/:userId', notificationController.onUserPressLike);
 
 export default app;

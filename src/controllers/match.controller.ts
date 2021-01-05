@@ -7,7 +7,7 @@ import { Conversation } from '../models/conversation.model';
 const usersRef = db.collection('users');
 const conversationsRef = db.collection('conversations');
 
-function getDistance(coordinates1: { lat: number; long: number }, coordinates2: { lat: number; long: number }) {
+const getDistance = (coordinates1: { lat: number; long: number }, coordinates2: { lat: number; long: number }) => {
     const R = 6371; // Radius of the earth in km
     const dLat = deg2rad(coordinates2.lat - coordinates1.lat); // deg2rad below
     const dLon = deg2rad(coordinates2.long - coordinates1.long); // deg2radlon1);
@@ -17,19 +17,19 @@ function getDistance(coordinates1: { lat: number; long: number }, coordinates2: 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c; // Distance in km
     return d;
-}
+};
 
-function deg2rad(deg: number) {
+const deg2rad = (deg: number) => {
     return deg * (Math.PI / 180);
-}
+};
 
-function computeAge(birthday: string) {
+const computeAge = (birthday: string) => {
     const diff = Date.now() - Date.parse(birthday);
     const ageDate = new Date(diff);
     return Math.abs(ageDate.getUTCFullYear() - 1970);
-}
+};
 
-export async function createConversion(userId: string, userIdBeLiked: string) {
+export const createConversion = async (userId: string, userIdBeLiked: string) => {
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
 
@@ -59,7 +59,7 @@ export async function createConversion(userId: string, userIdBeLiked: string) {
             });
         }
     });
-}
+};
 
 export const get = async (req: Request, res: Response) => {
     const filter = req.body as Filter;
@@ -178,7 +178,7 @@ export const like = async (req: Request, res: Response) => {
                 likedUsers: FieldValue.arrayUnion(req.params.userIdBeLiked),
             });
             createConversion(req.params.userId, req.params.userIdBeLiked);
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -193,7 +193,7 @@ export const ignore = async (req: Request, res: Response) => {
             ignoredYou: FieldValue.arrayUnion(req.params.userId),
         })
         .then(user => {
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -207,7 +207,7 @@ export const report = async (req: Request, res: Response) => {
             report: FieldValue.increment(1),
         })
         .then(user => {
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -226,7 +226,7 @@ export const superLike = async (req: Request, res: Response) => {
                 likedUsers: FieldValue.arrayUnion(req.params.userIdBeSuperLiked),
             });
             createConversion(req.params.userId, req.params.userIdBeSuperLiked);
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -244,7 +244,7 @@ export const unMatch = async (req: Request, res: Response) => {
             await usersRef.doc(userId).update({
                 likedUsers: FieldValue.arrayRemove(userIdBeUnMatch),
             });
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -260,7 +260,7 @@ export const block = async (req: Request, res: Response) => {
             blockedYou: FieldValue.arrayUnion(userId),
         })
         .then(user => {
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -276,7 +276,7 @@ export const unBlock = async (req: Request, res: Response) => {
             blockedYou: FieldValue.arrayRemove(userId),
         })
         .then(user => {
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);

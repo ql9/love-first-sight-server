@@ -15,9 +15,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-function randomCode() {
-    return Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
-}
+const randomCode = () => Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
 
 const getAddressFromCoordinates = (coordinates: any) => {
     return new Promise<void>(resolve => {

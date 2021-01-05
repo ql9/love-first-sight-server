@@ -1,9 +1,11 @@
-import { db } from '../config/firebase';
+import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
+import { Conversation } from '../models/conversation.model';
 
 const conversationsRef = db.collection('conversations');
+const usersRef = db.collection('users');
 
-function compare(a: any, b: any) {
+const compare = (a: any, b: any) => {
     if (a.lastModified < b.lastModified) {
         return 1;
     }
@@ -11,11 +13,11 @@ function compare(a: any, b: any) {
         return -1;
     }
     return 0;
-}
+};
 
-function splitName(name: string) {
+const splitName = (name: string) => {
     return name.split(/[, ]+/).pop();
-}
+};
 
 export const get = async (req: Request, res: Response) => {
     let state = true;
@@ -109,5 +111,48 @@ export const get = async (req: Request, res: Response) => {
         })
         .catch(err => {
             res.status(500).json(err);
+        });
+};
+
+export const sendMessageRequest = async (req: Request, res: Response) => {
+    const { senderId, receiverId } = req.body;
+
+    const user = await usersRef.doc(senderId).get();
+    const userBeLiked = await usersRef.doc(receiverId).get();
+
+    await like(senderId, receiverId)
+        .then(async () => {
+            const conversation = {
+                participants: [senderId, receiverId],
+                state: true,
+                users: [
+                    {
+                        userId: senderId,
+                        name: user.data()!.name,
+                        avatar: user.data()!.avatar,
+                    },
+                    {
+                        userId: receiverId,
+                        name: userBeLiked.data()!.name,
+                        avatar: userBeLiked.data()!.avatar,
+                    },
+                ],
+                matchedAt: new Date().getTime(),
+            } as Conversation;
+            await conversationsRef.add(conversation).then(con => res.status(201).json(con.id));
+        })
+        .catch(err => res.status(500).json(err));
+};
+
+const like = async (senderId: string, receiverId: string) => {
+    await usersRef
+        .doc(receiverId)
+        .update({
+            availableUsers: FieldValue.arrayRemove(senderId),
+        })
+        .then(async () => {
+            await usersRef.doc(senderId).update({
+                likedUsers: FieldValue.arrayUnion(receiverId),
+            });
         });
 };
