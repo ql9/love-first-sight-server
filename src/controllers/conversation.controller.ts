@@ -156,3 +156,16 @@ const like = async (senderId: string, receiverId: string) => {
             });
         });
 };
+
+export const updateStateConversation = async (req: Request, res: Response) => {
+    const { conversationId } = req.body;
+    await conversationsRef
+        .doc(conversationId)
+        .update({
+            state: false,
+        })
+        .then(() => {
+            res.status(200).json('Success!!');
+        })
+        .catch(err => res.status(500).json(err));
+};

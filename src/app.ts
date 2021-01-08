@@ -44,6 +44,7 @@ app.put('/second-look/super/:userId/:userIdBeSuperLiked', secondLookController.s
 
 // Conversation
 app.get('/conversation/:userId/:state', conversationController.get);
+app.put('/conversation/update-state', conversationController.updateStateConversation);
 
 // Message request
 app.post('/conversation/send-message', conversationController.sendMessageRequest);
