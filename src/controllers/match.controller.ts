@@ -2,7 +2,6 @@ import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Filter } from '../models/filer.model';
 import { Conversation } from '../models/conversation.model';
-// import { con } from './chat.controller';
 
 const usersRef = db.collection('users');
 const conversationsRef = db.collection('conversations');
@@ -30,35 +29,36 @@ const computeAge = (birthday: string) => {
 };
 
 export const createConversion = async (userId: string, userIdBeLiked: string) => {
+    const conver = await conversationsRef.where('participants', 'in', [[userId, userIdBeLiked]]).get();
+    if (conver) return;
+
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
 
     const likedUsers = userBeLiked.data()!.likedUsers;
 
-    likedUsers.forEach(async (uid: string) => {
-        if (uid === userId) {
-            const conversation = {
-                participants: [userId, userIdBeLiked],
-                state: false,
-                users: [
-                    {
-                        userId: userId,
-                        name: user.data()!.name,
-                        avatar: user.data()!.avatar,
-                    },
-                    {
-                        userId: userIdBeLiked,
-                        name: userBeLiked.data()!.name,
-                        avatar: userBeLiked.data()!.avatar,
-                    },
-                ],
-                matchedAt: new Date().getTime(),
-            } as Conversation;
-            await conversationsRef.add(conversation).then(con => {
-                console.log(con.id);
-            });
-        }
-    });
+    if (likedUsers.includes(userId)) {
+        const conversation = {
+            participants: [userId, userIdBeLiked],
+            state: false,
+            users: [
+                {
+                    userId: userId,
+                    name: user.data()!.name,
+                    avatar: user.data()!.avatar,
+                },
+                {
+                    userId: userIdBeLiked,
+                    name: userBeLiked.data()!.name,
+                    avatar: userBeLiked.data()!.avatar,
+                },
+            ],
+            matchedAt: new Date().getTime(),
+        } as Conversation;
+        await conversationsRef.add(conversation).then(con => {
+            console.log(con.id);
+        });
+    }
 };
 
 export const get = async (req: Request, res: Response) => {
