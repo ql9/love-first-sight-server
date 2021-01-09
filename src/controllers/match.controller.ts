@@ -66,7 +66,6 @@ export const get = async (req: Request, res: Response) => {
 
     const currentUser = await usersRef.doc(filter.userId).get();
     // const previousUser = await usersRef.doc(filter.preUserId).get();
-    console.log(typeof filter.userId);
 
     await usersRef
         .where('availableUsers', 'array-contains', filter.userId)
@@ -85,17 +84,17 @@ export const get = async (req: Request, res: Response) => {
                 results = results.filter(result => result.data.gender === filter.gender);
             }
             if (filter.distance) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     return getDistance(result.data.coordinates, currentUser.data()!.coordinates) <= filter.distance;
                 });
             }
             if (filter.age) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     return filter.age.from <= computeAge(result.data.birthday) && computeAge(result.data.birthday) <= filter.age.to;
                 });
             }
             if (filter.height) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.height) {
                         return filter.height.from <= result.data.height && result.data.height <= filter.height.to;
                     }
@@ -103,7 +102,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.lookingFor) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.lookingFor) {
                         return result.data.lookingFor === filter.lookingFor;
                     }
@@ -111,7 +110,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.drinking) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.drinking) {
                         return result.data.drinking === filter.drinking;
                     }
@@ -119,7 +118,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.smoking) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.smoking) {
                         return result.data.smoking === filter.smoking;
                     }
@@ -127,7 +126,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.kids) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.kids) {
                         return result.data.kids === filter.kids;
                     }
@@ -135,7 +134,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.from) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.from) {
                         return result.data.from === filter.from;
                     }
@@ -143,7 +142,7 @@ export const get = async (req: Request, res: Response) => {
                 });
             }
             if (filter.university) {
-                results = results.filter(function (result) {
+                results = results.filter(result => {
                     if (result.data.university) {
                         return result.data.university === filter.university;
                     }
@@ -168,16 +167,17 @@ export const get = async (req: Request, res: Response) => {
 };
 
 export const like = async (req: Request, res: Response) => {
+    const { userId, userIdBeLiked } = req.params;
     await usersRef
-        .doc(req.params.userIdBeLiked)
+        .doc(userIdBeLiked)
         .update({
-            availableUsers: FieldValue.arrayRemove(req.params.userId),
+            availableUsers: FieldValue.arrayRemove(userId),
         })
         .then(async user => {
-            await usersRef.doc(req.params.userId).update({
-                likedUsers: FieldValue.arrayUnion(req.params.userIdBeLiked),
+            await usersRef.doc(userId).update({
+                likedUsers: FieldValue.arrayUnion(userIdBeLiked),
             });
-            createConversion(req.params.userId, req.params.userIdBeLiked);
+            createConversion(userId, userIdBeLiked);
             res.status(200).json(user);
         })
         .catch(err => {
@@ -186,11 +186,12 @@ export const like = async (req: Request, res: Response) => {
 };
 
 export const ignore = async (req: Request, res: Response) => {
+    const { userId, userIdBeIgnored } = req.params;
     await usersRef
-        .doc(req.params.userIdBeIgnored)
+        .doc(userIdBeIgnored)
         .update({
-            availableUsers: FieldValue.arrayRemove(req.params.userId),
-            ignoredYou: FieldValue.arrayUnion(req.params.userId),
+            availableUsers: FieldValue.arrayRemove(userId),
+            ignoredYou: FieldValue.arrayUnion(userId),
         })
         .then(user => {
             res.status(200).json(user);
@@ -215,17 +216,18 @@ export const report = async (req: Request, res: Response) => {
 };
 
 export const superLike = async (req: Request, res: Response) => {
+    const { userId, userIdBeSuperLiked } = req.params;
     await usersRef
-        .doc(req.params.userIdBeSuperLiked)
+        .doc(userIdBeSuperLiked)
         .update({
             superLike: FieldValue.increment(1),
-            availableUsers: FieldValue.arrayRemove(req.params.userId),
+            availableUsers: FieldValue.arrayRemove(userId),
         })
         .then(async user => {
-            await usersRef.doc(req.params.userId).update({
-                likedUsers: FieldValue.arrayUnion(req.params.userIdBeSuperLiked),
+            await usersRef.doc(userId).update({
+                likedUsers: FieldValue.arrayUnion(userIdBeSuperLiked),
             });
-            createConversion(req.params.userId, req.params.userIdBeSuperLiked);
+            createConversion(userId, userIdBeSuperLiked);
             res.status(200).json(user);
         })
         .catch(err => {

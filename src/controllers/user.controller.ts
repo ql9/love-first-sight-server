@@ -45,31 +45,29 @@ const getAddressFromCoordinates = (coordinates: any) => {
 };
 
 export const sendCode = async (req: Request, res: Response) => {
+    const { email } = req.body;
     await usersRef
-        .where('email', '==', req.body.email)
+        .where('email', '==', email)
         .get()
         .then(async users => {
-            const usersId: string[] = [];
-            users.forEach(user => {
-                usersId.push(user.id);
-            });
-            if (usersId.length) {
+            if (users) {
                 res.status(405).json('that email address is already in use!');
+            } else {
+                const code = randomCode();
+                const mailOptions = {
+                    from: 'Stapler team',
+                    to: email,
+                    subject: 'Sign-up code for Stapler',
+                    text: 'This is code to active your Stapler account, do not share this code to anyone: ' + code,
+                };
+                await transporter.sendMail(mailOptions).then(() => {
+                    console.log(code);
+                    res.status(200).json(code);
+                });
             }
-            const code = randomCode();
-            const mailOptions = {
-                from: 'Stapler team',
-                to: req.body.email,
-                subject: 'Sign-up code for Stapler',
-                text: 'This is code to active your Stapler account, do not share this code to anyone: ' + code,
-            };
-            await transporter.sendMail(mailOptions).then(() => {
-                console.log(code);
-                res.status(200).json(code);
-            });
         })
         .catch(() => {
-            res.status(500).json('can not send code to ' + req.body.email);
+            res.status(500).json('can not send code to ' + email);
         });
 };
 
