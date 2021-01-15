@@ -16,7 +16,7 @@ export const like = async (req: Request, res: Response) => {
                 likedUsers: FieldValue.arrayUnion(userIdBeLiked),
             });
             createConversion(userId, userIdBeLiked);
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -32,7 +32,7 @@ export const ignore = async (req: Request, res: Response) => {
             blockedYou: FieldValue.arrayUnion(userId),
         })
         .then(user => {
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -52,7 +52,7 @@ export const superLike = async (req: Request, res: Response) => {
                 likedUsers: FieldValue.arrayUnion(userIdBeSuperLiked),
             });
             createConversion(userId, userIdBeSuperLiked);
-            res.status(204).json(user);
+            res.status(200).json(user);
         })
         .catch(err => {
             res.status(500).json(err);

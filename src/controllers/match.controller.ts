@@ -30,7 +30,7 @@ const computeAge = (birthday: string) => {
 
 export const createConversion = async (userId: string, userIdBeLiked: string) => {
     const convers = await conversationsRef.where('participants', 'in', [[userId, userIdBeLiked]]).get();
-    if (convers) return;
+    if (convers.size > 0) return;
 
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
