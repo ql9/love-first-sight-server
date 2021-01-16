@@ -50,7 +50,7 @@ export const sendCode = async (req: Request, res: Response) => {
         .where('email', '==', email)
         .get()
         .then(async users => {
-            if (users) {
+            if (users.size > 0) {
                 res.status(405).json('that email address is already in use!');
             } else {
                 const code = randomCode();
