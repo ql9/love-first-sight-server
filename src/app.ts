@@ -6,6 +6,7 @@ import * as secondLookController from './controllers/second-look.controller';
 import * as conversationController from './controllers/conversation.controller';
 import * as listController from './controllers/list.controller';
 import * as notificationController from './controllers/notification.controller';
+import * as agoraController from './controllers/agora.controller';
 
 const app = express();
 
@@ -52,5 +53,8 @@ app.post('/conversation/send-message', conversationController.sendMessageRequest
 // Notification
 app.get('/notification/message/:ownerId/:userId/:message/:conversationId', notificationController.onUserSendMessage);
 app.get('/notification/like/:ownerId/:userId', notificationController.onUserPressLike);
+
+// Agora
+app.post('/agora/create-key', agoraController.createKey);
 
 export default app;
