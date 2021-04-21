@@ -46,11 +46,13 @@ export const createConversion = async (userId: string, userIdBeLiked: string) =>
                     userId: userId,
                     name: user.data()!.name,
                     avatar: user.data()!.avatar,
+                    stateJoinCall: user.data()!.stateJoinCall,
                 },
                 {
                     userId: userIdBeLiked,
                     name: userBeLiked.data()!.name,
                     avatar: userBeLiked.data()!.avatar,
+                    stateJoinCall: userBeLiked.data()!.stateJoinCall,
                 },
             ],
             matchedAt: new Date().getTime(),
