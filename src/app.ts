@@ -53,6 +53,7 @@ app.post('/conversation/send-message', conversationController.sendMessageRequest
 // Notification
 app.get('/notification/message/:ownerId/:userId/:message/:conversationId', notificationController.onUserSendMessage);
 app.get('/notification/like/:ownerId/:userId', notificationController.onUserPressLike);
+app.post('/notification/call', notificationController.onCallVideo);
 
 // Agora
 app.post('/agora/create-key', agoraController.createKey);
