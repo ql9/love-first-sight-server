@@ -66,8 +66,10 @@ export const sendCode = async (req: Request, res: Response) => {
                 });
             }
         })
-        .catch(() => {
-            res.status(500).json('can not send code to ' + email);
+        .catch(err => {
+            console.log(err);
+            // res.status(500).json('can not send code to ' + email);
+            res.status(500).json(err);
         });
 };
 
