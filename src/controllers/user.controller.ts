@@ -43,7 +43,7 @@ export const sendCode = async (req: Request, res: Response) => {
         service: 'gmail',
         auth: {
             user: 'staplerapp@gmail.com',
-            pass: 'staplerapp123456',
+            pass: 'zesvhesbnfjfyxbh',
         },
     });
     await usersRef
