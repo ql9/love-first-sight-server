@@ -7,14 +7,6 @@ import fetch from 'node-fetch';
 const usersRef = db.collection('users');
 const HERE_API_KEY = 'q7ZExJiY6fZe7tWwSfbnZdIROAQAIB46WgXqZ1eYWXs';
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'staplerapp@gmail.com',
-        pass: 'staplerapp123456',
-    },
-});
-
 const randomCode = () => Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
 
 const getAddressFromCoordinates = (coordinates: any) => {
@@ -46,6 +38,14 @@ const getAddressFromCoordinates = (coordinates: any) => {
 
 export const sendCode = async (req: Request, res: Response) => {
     const { email } = req.body;
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure: false,
+        auth: {
+            user: 'staplerapp@gmail.com',
+            pass: 'staplerapp123456',
+        },
+    });
     await usersRef
         .where('email', '==', email)
         .get()
