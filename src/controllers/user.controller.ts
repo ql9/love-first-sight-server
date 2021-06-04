@@ -39,8 +39,8 @@ const getAddressFromCoordinates = (coordinates: any) => {
 export const sendCode = async (req: Request, res: Response) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
         service: 'gmail',
-        secure: false,
         auth: {
             user: 'staplerapp@gmail.com',
             pass: 'staplerapp123456',
