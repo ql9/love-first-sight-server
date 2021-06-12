@@ -179,7 +179,9 @@ export const like = async (req: Request, res: Response) => {
             await usersRef.doc(userId).update({
                 likedUsers: FieldValue.arrayUnion(userIdBeLiked),
             });
-            createConversion(userId, userIdBeLiked);
+            createConversion(userId, userIdBeLiked)
+                .then(result => console.log('result: ', result))
+                .catch(err => console.log('error: ', err));
             res.status(200).json(user);
         })
         .catch(err => {

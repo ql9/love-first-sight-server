@@ -100,6 +100,7 @@ export const createUser = async (req: Request, res: Response) => {
             images: images,
             likedUsers: likedUsers,
             blockedYou: blockedYou,
+            stateJoinCall: false,
         } as User;
 
         await usersRef

@@ -24,4 +24,5 @@ export interface User {
     createdAt: number;
     report: number;
     coordinates: { lat: number; long: number };
+    stateJoinCall: boolean;
 }
