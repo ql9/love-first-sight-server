@@ -145,6 +145,7 @@ export const onCallVideo = async (req: Request, res: Response) => {
                     // @ts-ignore: Object is possibly 'null'.
                     avatar: user?.avatar,
                     userId: (Math.floor(Math.random() * 100) + 1).toString(),
+                    ownerId: channel.userId,
                 },
             },
             {
