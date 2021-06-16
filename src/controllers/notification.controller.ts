@@ -157,3 +157,34 @@ export const onCallVideo = async (req: Request, res: Response) => {
         .then(() => res.status(200).json('send notification success!!'))
         .catch(error => res.status(500).json(error));
 };
+
+export const onEndCall = async (req: Request, res: Response) => {
+    const channel = req.body as Channel;
+    const tokens = await db
+        .collection('users')
+        .doc(channel.ownerId)
+        .get()
+        .then(owner => {
+            return owner.data()?.tokens;
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    await ms
+        .sendToDevice(
+            tokens,
+            {
+                data: {
+                    type: 'EndCall',
+                },
+            },
+            {
+                // Required for background/quit data-only messages on iOS
+                contentAvailable: true,
+                // Required for background/quit data-only messages on Android
+                priority: 'high',
+            },
+        )
+        .then(() => res.status(200).json('send notification success!!'))
+        .catch(error => res.status(500).json(error));
+};
