@@ -3,4 +3,5 @@ export interface Conversation {
     state: boolean;
     users: Array<{ userId: string; name: string; avatar: string; stateJoinCall: boolean }>;
     matchedAt: number;
+    createdAt: number;
 }

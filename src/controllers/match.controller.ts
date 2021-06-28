@@ -56,6 +56,7 @@ export const createConversion = async (userId: string, userIdBeLiked: string) =>
                 },
             ],
             matchedAt: new Date().getTime(),
+            createdAt: new Date().getTime(),
         } as Conversation;
         await conversationsRef.add(conversation).then(con => {
             console.log(con.id);
