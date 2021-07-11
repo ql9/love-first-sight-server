@@ -98,58 +98,37 @@ export const get = async (req: Request, res: Response) => {
             }
             if (filter.height) {
                 results = results.filter(result => {
-                    if (result.data.height) {
-                        return filter.height.from <= result.data.height && result.data.height <= filter.height.to;
-                    }
-                    return true;
+                    return filter.height.from <= result.data.height && result.data.height <= filter.height.to;
                 });
             }
             if (filter.lookingFor) {
                 results = results.filter(result => {
-                    if (result.data.lookingFor) {
-                        return result.data.lookingFor === filter.lookingFor;
-                    }
-                    return true;
+                    return result.data.lookingFor === filter.lookingFor;
                 });
             }
             if (filter.drinking) {
                 results = results.filter(result => {
-                    if (result.data.drinking) {
-                        return result.data.drinking === filter.drinking;
-                    }
-                    return true;
+                    return result.data.drinking === filter.drinking;
                 });
             }
             if (filter.smoking) {
                 results = results.filter(result => {
-                    if (result.data.smoking) {
-                        return result.data.smoking === filter.smoking;
-                    }
-                    return true;
+                    return result.data.smoking === filter.smoking;
                 });
             }
             if (filter.kids) {
                 results = results.filter(result => {
-                    if (result.data.kids) {
-                        return result.data.kids === filter.kids;
-                    }
-                    return true;
+                    return result.data.kids === filter.kids;
                 });
             }
             if (filter.from) {
                 results = results.filter(result => {
-                    if (result.data.from) {
-                        return result.data.from === filter.from;
-                    }
-                    return true;
+                    return result.data.from === filter.from;
                 });
             }
             if (filter.university) {
                 results = results.filter(result => {
-                    if (result.data.university) {
-                        return result.data.university === filter.university;
-                    }
-                    return true;
+                    return result.data.university === filter.university;
                 });
             }
             if (results.length) {
