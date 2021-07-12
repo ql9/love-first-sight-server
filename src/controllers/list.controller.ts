@@ -1,4 +1,4 @@
-import { db, documentId } from '../config/firebase';
+import { db } from '../config/firebase';
 import { Request, Response } from 'express';
 
 const usersRef = db.collection('users');
@@ -42,15 +42,20 @@ export const getUsersLiked = async (req: Request, res: Response) => {
 
 export const getUsersOnTop = async (req: Request, res: Response) => {
     await usersRef
-        .where(documentId, '!=', req.params.userId)
-        // .orderBy('superLike', 'desc')
-        .limit(10)
+        .orderBy('superLike', 'desc')
+        .limit(11)
         .get()
         .then(users => {
             const results: {
                 userId: string;
                 data: FirebaseFirestore.DocumentData;
             }[] = [];
+            const indexUser = users.docs.findIndex(user => user.id === req.params.userId);
+            if (indexUser >= 0) {
+                users.docs.splice(indexUser, 1);
+            } else {
+                users.docs.splice(users.docs.length, 1);
+            }
             users.forEach(user => results.push({ userId: user.id, data: user.data() }));
             if (results.length) {
                 const list = results.map(user => {
