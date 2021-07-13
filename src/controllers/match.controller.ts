@@ -29,8 +29,12 @@ const computeAge = (birthday: string) => {
 };
 
 export const createConversion = async (userId: string, userIdBeLiked: string) => {
-    const convers = await conversationsRef.where('participants', 'in', [[userId, userIdBeLiked]]).get();
-    if (convers.size > 0) return;
+    const conversBySender = await conversationsRef.where('participants', 'in', [[userId, userIdBeLiked]]).get();
+    const conversByReceiver = await conversationsRef.where('participants', 'in', [[userIdBeLiked, userId]]).get();
+    if (conversBySender.size > 0 || conversByReceiver.size > 0) {
+        console.log('already create');
+        return;
+    }
 
     const user = await usersRef.doc(userId).get();
     const userBeLiked = await usersRef.doc(userIdBeLiked).get();
@@ -59,7 +63,7 @@ export const createConversion = async (userId: string, userIdBeLiked: string) =>
             createdAt: new Date().getTime(),
         } as Conversation;
         await conversationsRef.add(conversation).then(con => {
-            console.log(con.id);
+            console.log('Create Conversation success with id: ' + con.id);
         });
     }
 };
@@ -159,9 +163,8 @@ export const like = async (req: Request, res: Response) => {
             await usersRef.doc(userId).update({
                 likedUsers: FieldValue.arrayUnion(userIdBeLiked),
             });
-            createConversion(userId, userIdBeLiked)
-                .then(result => console.log('result: ', result))
-                .catch(err => console.log('error: ', err));
+            console.log('Start create conversation');
+            createConversion(userId, userIdBeLiked);
             res.status(200).json(user);
         })
         .catch(err => {
