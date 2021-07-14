@@ -169,3 +169,13 @@ export const updateStateConversation = async (req: Request, res: Response) => {
         })
         .catch(err => res.status(500).json(err));
 };
+
+export const deleteConversationById = async (conversationsId: string) => {
+    await conversationsRef
+        .doc(conversationsId)
+        .delete()
+        .then(() => {
+            console.log(`deleted conversation ${conversationsId} success`);
+        })
+        .catch(err => console.log(err));
+};

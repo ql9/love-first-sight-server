@@ -25,7 +25,7 @@ app.post('/match', matchController.get);
 
 // Like / ignore / super like / report
 app.put('/match/like/:userId/:userIdBeLiked', matchController.like);
-app.put('/match/unmatch/:userId/:userIdBeUnMatch', matchController.unMatch);
+app.put('/match/unmatch/:userId/:userIdBeUnMatch/:conversationId', matchController.unMatch);
 app.put('/match/ignore/:userId/:userIdBeIgnored', matchController.ignore);
 app.put('/match/super/:userId/:userIdBeSuperLiked', matchController.superLike);
 app.put('/match/report/:userId/:userIdBeReported', matchController.report);

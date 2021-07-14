@@ -2,6 +2,7 @@ import { db, FieldValue } from '../config/firebase';
 import { Request, Response } from 'express';
 import { Filter } from '../models/filer.model';
 import { Conversation } from '../models/conversation.model';
+import { deleteConversationById } from './conversation.controller';
 
 const usersRef = db.collection('users');
 const conversationsRef = db.collection('conversations');
@@ -223,7 +224,10 @@ export const superLike = async (req: Request, res: Response) => {
 };
 
 export const unMatch = async (req: Request, res: Response) => {
-    const { userId, userIdBeUnMatch } = req.params;
+    const { userId, userIdBeUnMatch, conversationId } = req.params;
+
+    deleteConversationById(conversationId);
+
     await usersRef
         .doc(userIdBeUnMatch)
         .update({
