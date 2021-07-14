@@ -230,7 +230,7 @@ const removeMatches = async (userId: string, userId2: string) => {
             availableUsers: FieldValue.arrayUnion(userId2),
         })
         .then(async user => {
-            await usersRef.doc(userId).update({
+            await usersRef.doc(userId2).update({
                 likedUsers: FieldValue.arrayRemove(userId),
             });
             console.log('unmatch from ' + userId);
@@ -245,10 +245,16 @@ export const unMatch = async (req: Request, res: Response) => {
 
     deleteConversationById(conversationId);
 
-    await removeMatches(userId, userIdBeUnMatch);
-    await removeMatches(userIdBeUnMatch, userId);
-
-    res.status(200).json('success');
+    await removeMatches(userId, userIdBeUnMatch)
+        .then(async () => {
+            await removeMatches(userIdBeUnMatch, userId).then(() => {
+                console.log('unmatch Success');
+                res.status(200).json('success');
+            });
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
 };
 
 export const block = async (req: Request, res: Response) => {
