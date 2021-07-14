@@ -223,25 +223,32 @@ export const superLike = async (req: Request, res: Response) => {
         });
 };
 
+const removeMatches = async (userId: string, userId2: string) => {
+    await usersRef
+        .doc(userId)
+        .update({
+            availableUsers: FieldValue.arrayUnion(userId2),
+        })
+        .then(async user => {
+            await usersRef.doc(userId).update({
+                likedUsers: FieldValue.arrayRemove(userId),
+            });
+            console.log('unmatch from ' + userId);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+};
+
 export const unMatch = async (req: Request, res: Response) => {
     const { userId, userIdBeUnMatch, conversationId } = req.params;
 
     deleteConversationById(conversationId);
 
-    await usersRef
-        .doc(userIdBeUnMatch)
-        .update({
-            availableUsers: FieldValue.arrayUnion(userId),
-        })
-        .then(async user => {
-            await usersRef.doc(userId).update({
-                likedUsers: FieldValue.arrayRemove(userIdBeUnMatch),
-            });
-            res.status(200).json(user);
-        })
-        .catch(err => {
-            res.status(500).json(err);
-        });
+    await removeMatches(userId, userIdBeUnMatch);
+    await removeMatches(userIdBeUnMatch, userId);
+
+    res.status(200).json('success');
 };
 
 export const block = async (req: Request, res: Response) => {
